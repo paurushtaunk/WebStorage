@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Entry App with Edit & Delete</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input {
+      margin: 5px;
+      padding: 8px;
+    }
+    button {
+      padding: 6px 10px;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+    ul {
+      margin-top: 20px;
+      padding-left: 0;
+      list-style: none;
+    }
+    li {
+      background-color: #f2f2f2;
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+    }
+    .actions button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Enter Your Data</h2>
+  <input type="date" id="inputDate" placeholder="Date field">
+  <input type="text" id="input1" placeholder="Spend Area field" oninput="validateAlphabet(this)>
+  <input type="text" id="input2" placeholder="Amount field"> Rs
+  <button onclick="addData()">Submit</button>
+
+  <ul id="dataList"></ul>
+
+  <script>
+    let data = JSON.parse(localStorage.getItem('storedData')) || [];
+
+    function updateList() {
+      const list = document.getElementById('dataList');
+      list.innerHTML = '';
+
+      data.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>#${index + 1}: ${item.inputDate} -----  ${item.input1} ----- ${item.input2}'Rs'</span>
+          <span class="actions">
+            <button onclick="editData(${index})">Edit</button>
+            <button onclick="deleteData(${index})">Delete</button>
+          </span>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function addData() {
+      const inputDate = document.getElementById('inputDate').value.trim();
+      const input1 = document.getElementById('input1').value.trim();
+      const input2 = document.getElementById('input2').value.trim();
+
+      if (inputDate && input1 && input2) {
+        data.push({ inputDate, input1, input2 });
+        localStorage.setItem('storedData', JSON.stringify(data));
+        updateList();
+        document.getElementById('inputDate').value = '';
+        document.getElementById('input1').value = '';
+        document.getElementById('input2').value = '';
+      }
+    }
+
+    function deleteData(index) {
+      data.splice(index, 1);
+      localStorage.setItem('storedData', JSON.stringify(data));
+      updateList();
+    }
+
+    function editData(index) {
+      const item = data[index];
+      const newInputDate = prompt("Edit First Field:", item.inputDate);
+      const newInput1 = prompt("Edit First Field:", item.input1);
+      const newInput2 = prompt("Edit Second Field:", item.input2);
+
+      if (newInputDate !== null && newInput1 !== null && newInput2 !== null && newInput1.trim() && newInput2.trim()) {
+        data[index] = {inputDate: newInputDate.trim(), input1: newInput1.trim(), input2: newInput2.trim() };
+        localStorage.setItem('storedData', JSON.stringify(data));
+        updateList();
+      }
+    }
+
+    function validateAlphabet(input) {
+      input.value = input.value.replace(/[^a-zA-Z ]/g, '');
+    }
+
+    window.onload = updateList;
+  </script>
+</body>
+</html>
